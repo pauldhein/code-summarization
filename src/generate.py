@@ -33,12 +33,20 @@ def generate_embed():
     code_emb = model.add_lookup_parameters((CODE_VOC_SIZE, CODE_EMB_DIM))
     # code_emb.init_from_array(code_emb_arr)
 
-    enc_fwd_lstm = dy.LSTMBuilder(FWD_LSTM_NUM_LAYERS, CODE_EMB_DIM, STATE_SIZE, model)
-    enc_bwd_lstm = dy.LSTMBuilder(BWD_LSTM_NUM_LAYERS, CODE_EMB_DIM, STATE_SIZE, model)
-    dec_lstm = dy.LSTMBuilder(DEC_LSTM_NUM_LAYERS, STATE_SIZE*2+LANG_EMB_DIM, STATE_SIZE, model)
+    enc_fwd_lstm = dy.LSTMBuilder(
+        FWD_LSTM_NUM_LAYERS, CODE_EMB_DIM, STATE_SIZE, model
+    )
+    enc_bwd_lstm = dy.LSTMBuilder(
+        BWD_LSTM_NUM_LAYERS, CODE_EMB_DIM, STATE_SIZE, model
+    )
+    dec_lstm = dy.LSTMBuilder(
+        DEC_LSTM_NUM_LAYERS, STATE_SIZE * 2 + LANG_EMB_DIM, STATE_SIZE, model
+    )
 
-    attention_w1 = model.add_parameters((ATTENTION_SIZE, STATE_SIZE*2))
-    attention_w2 = model.add_parameters((ATTENTION_SIZE, STATE_SIZE*BWD_LSTM_NUM_LAYERS*2))
+    attention_w1 = model.add_parameters((ATTENTION_SIZE, STATE_SIZE * 2))
+    attention_w2 = model.add_parameters(
+        (ATTENTION_SIZE, STATE_SIZE * BWD_LSTM_NUM_LAYERS * 2)
+    )
     attention_v = model.add_parameters((1, ATTENTION_SIZE))
     decoder_w = model.add_parameters((LANG_VOC_SIZE, STATE_SIZE))
     decoder_b = model.add_parameters((LANG_VOC_SIZE))
@@ -69,13 +77,15 @@ def generate_embed():
 
         state = dec_lstm.initial_state()
         embed_prev_output = lang_emb[lang2int[lang_input[1]]]
-        full_input = dy.concatenate([dy.vecInput(STATE_SIZE*2), embed_prev_output])
+        full_input = dy.concatenate(
+            [dy.vecInput(STATE_SIZE * 2), embed_prev_output]
+        )
         state = state.add_input(full_input)
 
         translation = []
         count_EOS = 0
         W1dt = None
-        for i in range(len(lang_input)*2):
+        for i in range(len(lang_input) * 2):
             if count_EOS == 2:
                 break
 
@@ -85,7 +95,9 @@ def generate_embed():
             W2 = dy.parameter(attention_w2)
             v = dy.parameter(attention_v)
             W2dt = W2 * dy.concatenate(list(state.s()))
-            unnormalized = dy.transpose(v * dy.tanh(dy.colwise_add(W1dt, W2dt)))
+            unnormalized = dy.transpose(
+                v * dy.tanh(dy.colwise_add(W1dt, W2dt))
+            )
             context = input_mat * dy.softmax(unnormalized)
 
             vector = dy.concatenate([context, embed_prev_output])
@@ -137,13 +149,15 @@ def generate_embed():
 
         state = dec_lstm.initial_state()
         embed_prev_output = lang_emb[lang2int[lang_input[1]]]
-        full_input = dy.concatenate([dy.vecInput(STATE_SIZE*2), embed_prev_output])
+        full_input = dy.concatenate(
+            [dy.vecInput(STATE_SIZE * 2), embed_prev_output]
+        )
         state = state.add_input(full_input)
 
         translation = []
         count_EOS = 0
         W1dt = None
-        for i in range(len(lang_input)*2):
+        for i in range(len(lang_input) * 2):
             if count_EOS == 2:
                 break
 
@@ -153,7 +167,9 @@ def generate_embed():
             W2 = dy.parameter(attention_w2)
             v = dy.parameter(attention_v)
             W2dt = W2 * dy.concatenate(list(state.s()))
-            unnormalized = dy.transpose(v * dy.tanh(dy.colwise_add(W1dt, W2dt)))
+            unnormalized = dy.transpose(
+                v * dy.tanh(dy.colwise_add(W1dt, W2dt))
+            )
             context = input_mat * dy.softmax(unnormalized)
 
             vector = dy.concatenate([context, embed_prev_output])
@@ -215,12 +231,20 @@ def generate_non_embed():
     code_emb = model.add_lookup_parameters((CODE_VOC_SIZE, CODE_EMB_DIM))
     # code_emb.init_from_array(code_emb_arr)
 
-    enc_fwd_lstm = dy.LSTMBuilder(FWD_LSTM_NUM_LAYERS, CODE_EMB_DIM, STATE_SIZE, model)
-    enc_bwd_lstm = dy.LSTMBuilder(BWD_LSTM_NUM_LAYERS, CODE_EMB_DIM, STATE_SIZE, model)
-    dec_lstm = dy.LSTMBuilder(DEC_LSTM_NUM_LAYERS, STATE_SIZE*2+LANG_EMB_DIM, STATE_SIZE, model)
+    enc_fwd_lstm = dy.LSTMBuilder(
+        FWD_LSTM_NUM_LAYERS, CODE_EMB_DIM, STATE_SIZE, model
+    )
+    enc_bwd_lstm = dy.LSTMBuilder(
+        BWD_LSTM_NUM_LAYERS, CODE_EMB_DIM, STATE_SIZE, model
+    )
+    dec_lstm = dy.LSTMBuilder(
+        DEC_LSTM_NUM_LAYERS, STATE_SIZE * 2 + LANG_EMB_DIM, STATE_SIZE, model
+    )
 
-    attention_w1 = model.add_parameters((ATTENTION_SIZE, STATE_SIZE*2))
-    attention_w2 = model.add_parameters((ATTENTION_SIZE, STATE_SIZE*BWD_LSTM_NUM_LAYERS*2))
+    attention_w1 = model.add_parameters((ATTENTION_SIZE, STATE_SIZE * 2))
+    attention_w2 = model.add_parameters(
+        (ATTENTION_SIZE, STATE_SIZE * BWD_LSTM_NUM_LAYERS * 2)
+    )
     attention_v = model.add_parameters((1, ATTENTION_SIZE))
     decoder_w = model.add_parameters((LANG_VOC_SIZE, STATE_SIZE))
     decoder_b = model.add_parameters((LANG_VOC_SIZE))
@@ -251,13 +275,15 @@ def generate_non_embed():
 
         state = dec_lstm.initial_state()
         embed_prev_output = lang_emb[lang2int[lang_input[1]]]
-        full_input = dy.concatenate([dy.vecInput(STATE_SIZE*2), embed_prev_output])
+        full_input = dy.concatenate(
+            [dy.vecInput(STATE_SIZE * 2), embed_prev_output]
+        )
         state = state.add_input(full_input)
 
         translation = []
         count_EOS = 0
         W1dt = None
-        for i in range(len(lang_input)*2):
+        for i in range(len(lang_input) * 2):
             if count_EOS == 2:
                 break
 
@@ -267,7 +293,9 @@ def generate_non_embed():
             W2 = dy.parameter(attention_w2)
             v = dy.parameter(attention_v)
             W2dt = W2 * dy.concatenate(list(state.s()))
-            unnormalized = dy.transpose(v * dy.tanh(dy.colwise_add(W1dt, W2dt)))
+            unnormalized = dy.transpose(
+                v * dy.tanh(dy.colwise_add(W1dt, W2dt))
+            )
             context = input_mat * dy.softmax(unnormalized)
 
             vector = dy.concatenate([context, embed_prev_output])
@@ -319,13 +347,15 @@ def generate_non_embed():
 
         state = dec_lstm.initial_state()
         embed_prev_output = lang_emb[lang2int[lang_input[1]]]
-        full_input = dy.concatenate([dy.vecInput(STATE_SIZE*2), embed_prev_output])
+        full_input = dy.concatenate(
+            [dy.vecInput(STATE_SIZE * 2), embed_prev_output]
+        )
         state = state.add_input(full_input)
 
         translation = []
         count_EOS = 0
         W1dt = None
-        for i in range(len(lang_input)*2):
+        for i in range(len(lang_input) * 2):
             if count_EOS == 2:
                 break
 
@@ -335,7 +365,9 @@ def generate_non_embed():
             W2 = dy.parameter(attention_w2)
             v = dy.parameter(attention_v)
             W2dt = W2 * dy.concatenate(list(state.s()))
-            unnormalized = dy.transpose(v * dy.tanh(dy.colwise_add(W1dt, W2dt)))
+            unnormalized = dy.transpose(
+                v * dy.tanh(dy.colwise_add(W1dt, W2dt))
+            )
             context = input_mat * dy.softmax(unnormalized)
 
             vector = dy.concatenate([context, embed_prev_output])
@@ -380,9 +412,11 @@ def encode_sentence(enc_fwd_rnn, enc_bwd_rnn, emb_sent):
     fwd_vecs = f_init.transduce(emb_sent)
     bwd_vecs = b_init.transduce(reversed(emb_sent))
 
-    return [dy.concatenate([f, b]) for f, b in zip(fwd_vecs, reversed(bwd_vecs))]
+    return [
+        dy.concatenate([f, b]) for f, b in zip(fwd_vecs, reversed(bwd_vecs))
+    ]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     generate_embed()
     generate_non_embed()
